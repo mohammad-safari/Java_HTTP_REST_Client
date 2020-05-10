@@ -1,7 +1,7 @@
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import javax.swing.JOptionPane;
-import View.*;
+
+import View.Frame;
 
 public class Main {
     public static void main(final String[] args) {
