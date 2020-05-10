@@ -1,26 +1,28 @@
 package View;
 
 import java.awt.Color;
+import java.awt.Insets;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
-import java.awt.Insets;
 
-import javax.swing.JLabel;
 import javax.swing.JMenu;
-import javax.swing.JMenuItem;
+import javax.swing.JTree;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JMenuItem;
 import javax.swing.JTextField;
-import javax.swing.JTree;
+import javax.swing.JTabbedPane;
 
 import Controller.Controller;
 
 public class SidePanel extends JPanel {
-    private MenuButton workspaceBox = new MenuButton("Workspace"), envBox = new MenuButton("Environment");
-    private JMenuItem workspaceSetting = new JMenuItem("workspace setting"), addWorkspace = new JMenu("add workspace");
-    private JButton cookiesButton = new JButton("Cookies"), addRequestButton = new JButton("Add");
+    private MenuButton workspaceBox = new MenuButton("Workspace"), environmentButton = new MenuButton("Environment"), addRequestButton = new MenuButton("Add");
+    private JMenuItem workspaceSetting = new JMenuItem("workspace setting"), addWorkspace = new JMenuItem("create workspace");
+    private JMenuItem environmentManagement = new JMenuItem("environment management"), addEnvironment = new JMenuItem("add environment");
+    private JMenuItem addRequest = new JMenuItem("request"), addFolder = new JMenuItem("folder");
+    private JButton cookiesButton = new JButton("Cookies");
     private JTextField reqFilter = new JTextField("Filter");
     private JTree reqTree = new JTree();
     private Controller controller;
@@ -45,13 +47,16 @@ public class SidePanel extends JPanel {
         c.weighty = 0.25;
         add(workspaceBox, c);
         workspaceBox.add(workspaceSetting);
+        workspaceBox.add(addWorkspace);
         c.gridx = 0;
         c.gridy = 1;
         c.gridheight = 1;
         c.gridwidth = 3;
         c.weightx = 0.5;
         c.weighty = 0.25;
-        add(envBox, c);
+        add(environmentButton, c);
+        environmentButton.add(addEnvironment);
+        environmentButton.add(environmentManagement);
         c.gridx = 3;
         c.gridy = 1;
         c.gridheight = 1;
@@ -71,6 +76,8 @@ public class SidePanel extends JPanel {
         c.gridwidth = 1;
         c.weightx = 0.25;
         add(addRequestButton, c);
+        addRequestButton.add(addRequest);
+        addRequestButton.add(addFolder);
         c.gridx = 0;
         c.gridy = 3;
         c.gridheight = GridBagConstraints.REMAINDER;

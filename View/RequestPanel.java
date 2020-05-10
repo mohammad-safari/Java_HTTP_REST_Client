@@ -1,16 +1,16 @@
 package View;
 
 import java.awt.Color;
+import java.awt.Insets;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
-import java.awt.Insets;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
+import javax.swing.JTabbedPane;
 
 import Controller.Controller;
 
@@ -19,8 +19,7 @@ public class RequestPanel extends JPanel {
      *
      */
     private static final long serialVersionUID = -152062743165019082L;
-    private String[] types = new String[] { "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS",
-            "HEAD",
+    private String[] types = new String[] { "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD",
             "Custom Method" };
     private JComboBox reqBox = new JComboBox<String>(types);
     private JTextField addressBar = new JTextField("8.8.8.8");
@@ -67,8 +66,8 @@ public class RequestPanel extends JPanel {
         c.gridheight = GridBagConstraints.REMAINDER;
         c.weighty = 5;
         add(reqPanel, c);
-        reqPanel.addTab("Body", body);
-        reqPanel.addTab("Auth", auth);
+        reqPanel.addTab("Body "+'\u2b9b', body);
+        reqPanel.addTab("Auth "+'\u2b9b', auth);
         reqPanel.addTab("Query", query);
         reqPanel.addTab("Header", header);
         reqPanel.addTab("Docs", docs);

@@ -1,11 +1,14 @@
 package View;
 
 import java.awt.Color;
-import java.awt.GridBagLayout;
+import java.awt.Dimension;
 
+import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.border.EmptyBorder;
 
 import Controller.Controller;
 
@@ -15,8 +18,9 @@ public class ResponsePanel extends JPanel {
      */
     private static final long serialVersionUID = -7634778642783201670L;
     private JTabbedPane resPanel = new JTabbedPane();
-    private JPanel prev = new JPanel(), cookie = new JPanel(), resheader = new JPanel(), timeline = new JPanel();
-    private JLabel success, ping, size;
+    private MenuButton historyButton = new MenuButton("Time Line");
+    private JPanel prev = new JPanel(), cookie = new JPanel(), header = new JPanel(), timeline = new JPanel();
+    private JLabel state = new JLabel(), ping = new JLabel(), size = new JLabel();
     private Controller controller;
 
     public ResponsePanel() {
@@ -26,8 +30,35 @@ public class ResponsePanel extends JPanel {
 
     private void init() {
         // right panel(response panel)
-        setLayout(new GridBagLayout());
+        GroupLayout glo = new GroupLayout(this);
+        glo.setAutoCreateGaps(true);
+        glo.setAutoCreateContainerGaps(true);
+        setLayout(glo);
+        glo.setHorizontalGroup(glo.createParallelGroup()
+                .addGroup(glo.createParallelGroup()
+                        .addGroup(glo.createSequentialGroup().addComponent(state).addComponent(ping).addComponent(size)
+                                .addGap(10, 75, 600).addComponent(historyButton)))
+                .addComponent(resPanel));
+        glo.setVerticalGroup(glo.createSequentialGroup().addGroup(glo.createParallelGroup().addComponent(state)
+                .addComponent(ping).addComponent(size).addComponent(historyButton, 40, 40, 40)).addComponent(resPanel));
         setBackground(new Color(.3f, .2f, .4f));
+        historyButton.setPreferredSize(new Dimension(50, 30));
+        state.setText("state");
+        state.setOpaque(true);
+        state.setBackground(Color.WHITE);
+        state.setBorder(new EmptyBorder(10, 10, 10, 10));
+        ping.setText("000 ms");
+        ping.setOpaque(true);
+        ping.setBackground(Color.WHITE);
+        ping.setBorder(new EmptyBorder(10, 10, 10, 10));
+        size.setText("000 b");
+        size.setOpaque(true);
+        size.setBackground(Color.WHITE);
+        size.setBorder(new EmptyBorder(10, 10, 10, 10));
+        resPanel.addTab("Preview", prev);
+        resPanel.addTab("Header", header);
+        resPanel.addTab("Cookie", cookie);
+        resPanel.addTab("TimeLine", timeline);
     }
 
     /**

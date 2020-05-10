@@ -12,14 +12,16 @@ public class Main {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (final Exception e1) {
+
                 try {
                     UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
                     System.out.println("Couldnt Set System Look and Feel!");
                 } catch (final Exception e2) {
                     System.out.println("Couldnt Set NATIVE Look and Feel!");
                 }
+                
             }
-        // Assembling MVC Parts
+        // assembling MVC parts
         final Frame view = new Frame();
 
     }

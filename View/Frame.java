@@ -1,7 +1,7 @@
 package View;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
@@ -16,15 +16,15 @@ public class Frame extends JFrame {
     Controller controller;
 
     // components of main frame
+    SidePanel sidePanel = new SidePanel();
+    // response panel
     private MenuBar menuBar = new MenuBar();
-    // panes and panels of main frame
-    private JSplitPane right = new JSplitPane(), left = new JSplitPane();
     // request panel
     RequestPanel requestPanel = new RequestPanel();
     // side panel
-    SidePanel sidePanel = new SidePanel();
-    // response panel
     ResponsePanel responsePanel = new ResponsePanel();
+    // panes and panels of main frame
+    private JSplitPane right = new JSplitPane(), left = new JSplitPane();
 
     public Frame() {
         // frame initialization
@@ -39,18 +39,18 @@ public class Frame extends JFrame {
 
         // left pane
         left.setBorder(null);
-        left.setDividerSize(1);
-        left.setDividerLocation(200);
         left.setOpaque(true);
-        left.setBackground(new Color(.3f, .2f, .4f));
+        left.setDividerSize(1);
+        left.setDividerLocation(300);
         left.setRightComponent(right);
         left.setLeftComponent(sidePanel);
+        left.setBackground(new Color(.3f, .2f, .4f));
 
         // right pane
         right.setBorder(null);
-        right.setDividerSize(1);
-        right.setDividerLocation(350);
         right.setOpaque(true);
+        right.setDividerSize(1);
+        right.setDividerLocation(375);
         right.setLeftComponent(requestPanel);
         right.setRightComponent(responsePanel);
 
