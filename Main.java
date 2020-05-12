@@ -1,4 +1,9 @@
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import View.Frame;
@@ -21,7 +26,16 @@ public class Main {
                 }
 
             }
-        // assembling MVC parts
-        final Frame view = new Frame();
+        // try {
+        //     SwingUtilities.invokeAndWait(new Runnable() {
+        //         public void run() {
+                    // assembling MVC parts
+                    final Frame view = new Frame();
+        //         }
+        //     });
+        // } catch (InvocationTargetException | InterruptedException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
     }
 }

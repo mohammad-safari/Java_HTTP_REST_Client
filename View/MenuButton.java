@@ -22,7 +22,12 @@ public class MenuButton extends JToggleButton {
         super(text);
         origin = text;
         menu = new JPopupMenu(text);
-        super.addActionListener(e -> {if(menued){menu.show(this, (getWidth() / 2), getHeight() + 1);setSelected(false);}});
+        super.addActionListener(e -> {
+            if (menued) {
+                menu.show(this, (getWidth() / 2), getHeight() + 1);
+                setSelected(false);
+            }
+        });
     }
 
     public MenuButton(String text, int x, int y) {
@@ -34,10 +39,10 @@ public class MenuButton extends JToggleButton {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        if(arrow == 1)
-        g.drawString("\u2b9f", getWidth() - 20, (int) (getHeight() / 2) + 1);
-        else if(arrow == 2)
-        g.drawString("\u2b9b", getWidth() - 20, (int) (getHeight() / 2) + 1);
+        if (arrow == 1)
+            g.drawString("\u2b9f", getWidth() - 20, (int) (getHeight() / 2) + 1);
+        else if (arrow == 2)
+            g.drawString("\u2b9b", getWidth() - 20, (int) (getHeight() / 2) + 1);
 
     }
 
@@ -46,6 +51,7 @@ public class MenuButton extends JToggleButton {
      * @param item to add to menu
      */
     public void add(JMenuItem item) {
+        arrow = 1;
         menu.add(item);
     }
 
@@ -79,6 +85,7 @@ public class MenuButton extends JToggleButton {
     public void setText(String text) {
         super.setText(text);
     }
+
     /**
      * @param menued the menued to set
      */

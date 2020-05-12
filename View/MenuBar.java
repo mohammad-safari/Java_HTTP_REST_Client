@@ -1,7 +1,9 @@
 package View;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -45,13 +47,17 @@ public class MenuBar extends JMenuBar {
                         dataFolder = new JMenuItem("app data folder"),
                         license = new JMenuItem("show open source licenses"),
                         shortcut = new JMenuItem("keyboard shortcut"), help = new JMenuItem("app help");
+        // preference
+        JCheckBox fred = new JCheckBox("Follow Redirect");
+        JCheckBox hide = new JCheckBox("Hide on System Tray");
 
         public MenuBar() {
                 setBorderPainted(false);
                 add(appMenu);
                 appMenu.setMnemonic(KeyEvent.VK_A);
-                //
+                // appMenu
                 appMenu.add(pref);
+                pref.addActionListener(e -> setPreference());
 
                 appMenu.add(chlog);
 
@@ -71,7 +77,7 @@ public class MenuBar extends JMenuBar {
 
                 add(editMenu);
                 editMenu.setMnemonic(KeyEvent.VK_E);
-                //
+                // editMenu
                 editMenu.add(undo);
                 undo.setAccelerator(KeyStroke.getKeyStroke("control Z"));
 
@@ -94,12 +100,14 @@ public class MenuBar extends JMenuBar {
 
                 add(viewMenu);
                 viewMenu.setMnemonic(KeyEvent.VK_V);
-                //
+                // viewMenu
                 viewMenu.add(full);
                 full.setAccelerator(KeyStroke.getKeyStroke("F11"));
+                full.addActionListener(e -> ((Frame) getParent()).toggleFullScreen());
 
                 viewMenu.add(actual);
                 actual.setAccelerator(KeyStroke.getKeyStroke("control 0"));
+                actual.addActionListener(e -> ((Frame) getParent()).toggleActual());
 
                 viewMenu.add(zin);
                 zin.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, ActionEvent.CTRL_MASK));
@@ -108,25 +116,27 @@ public class MenuBar extends JMenuBar {
                 zout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, ActionEvent.CTRL_MASK));
 
                 viewMenu.add(sidebar);
+                sidebar.addActionListener(e -> ((Frame) getParent()).toggleSidePanel());
 
                 viewMenu.add(devtools);
 
                 add(winMenu);
                 winMenu.setMnemonic(KeyEvent.VK_W);
-                //
+                // winMenu
                 winMenu.add(mini);
 
                 mini.setAccelerator(KeyStroke.getKeyStroke("control M"));
 
                 add(toolMenu);
                 toolMenu.setMnemonic(KeyEvent.VK_T);
-                //
+                // toolMenu
                 toolMenu.add(plugins);
 
                 add(helpMenu);
                 helpMenu.setMnemonic(KeyEvent.VK_H);
-                //
+                // helpMenu
                 helpMenu.add(about);
+                about.addActionListener(e -> new About());
 
                 helpMenu.add(support);
 
@@ -138,6 +148,21 @@ public class MenuBar extends JMenuBar {
 
                 helpMenu.add(help);
                 help.setAccelerator(KeyStroke.getKeyStroke("F1"));
+
+                
+
+        }
+
+        private void setPreference() {
+                JFrame pref = new JFrame("Preferences");
+                // pref.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                pref.setBounds(200, 200, 300, 200);
+                JPanel panel = new JPanel();
+                panel.add(fred);
+                panel.add(hide);
+                pref.add(panel);
+
+                pref.setVisible(true);
         }
 
         public void setController(Controller controller) {

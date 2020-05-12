@@ -13,6 +13,13 @@ import java.awt.Container;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
+/**
+ * a class that implements more dynaminc tabbedpanel not pane with
+ * buttons(toggle) as tabs with the help of menu button
+ * 
+ * @author M.Safari
+ */
+
 public class TabbedPanel extends JPanel {
     /**
      *
@@ -36,7 +43,7 @@ public class TabbedPanel extends JPanel {
             }
             AllButtonPressedOut();
             btn.setSelected(true);
-    }
+        }
     };
 
     public TabbedPanel() {
@@ -63,8 +70,8 @@ public class TabbedPanel extends JPanel {
         buttonPanel.add(btn, c);
         panel.add(tab, text);
         tabs.put(btn, tab);
-        if(tabs.size() == 1)
-        btn.setSelected(true);
+        if (tabs.size() == 1)
+            btn.setSelected(true);
         return btn;
     }
 

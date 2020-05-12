@@ -5,12 +5,18 @@ import java.awt.Dimension;
 
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.StyledDocument;
+import javax.swing.text.StyledEditorKit;
+import javax.swing.text.html.HTMLEditorKit;
 
 import Controller.Controller;
 
@@ -21,9 +27,12 @@ public class ResponsePanel extends JPanel {
     private static final long serialVersionUID = -7634778642783201670L;
     private TabbedPanel resPanel = new TabbedPanel();
     private MenuButton historyButton = new MenuButton("History");
-    JScrollPane previewTab = new JScrollPane();
+    private JTextPane previewTab = new JTextPane();
     private JPanel prev = new JPanel(), cookie = new JPanel(), header = new JPanel(), timeline = new JPanel();
     private JLabel state = new JLabel(), ping = new JLabel(), size = new JLabel();
+
+    private JMenuItem rawText = new JMenuItem("raw style"), HTMLStyle = new JMenuItem("HTML style");
+
     private Controller controller;
 
     public ResponsePanel() {
@@ -62,9 +71,17 @@ public class ResponsePanel extends JPanel {
         resPanel.addTab("Header", header);
         resPanel.addTab("Cookie", cookie);
         resPanel.addTab("TimeLine", timeline);
-        
-        previewTab.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        previewTab.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        resPanel.getButton("Preview").setMenued(true);
+        ;
+        resPanel.getButton("Preview").add(rawText);
+        resPanel.getButton("Preview").add(HTMLStyle);
+        rawText.addActionListener(e -> setRawText());
+        HTMLStyle.addActionListener(e -> setHTMLText());
+        setHTMLText();
+        previewTab.setText(
+                "<p></br></br></br>this is a <b>html</b> text<p></br></br><a href=\"https://www.google.com\">Here!</a>");
+
     }
 
     /**
@@ -75,4 +92,21 @@ public class ResponsePanel extends JPanel {
 
     }
 
+    public void setRawText() {
+        previewTab.setEditorKit(new StyledEditorKit());
+        previewTab.setText(previewTab.getText());
+        HTMLStyle.setEnabled(true);
+        rawText.setEnabled(false);
+        revalidate();
+        repaint();
+    }
+
+    public void setHTMLText() {
+        previewTab.setEditorKit(new HTMLEditorKit());
+        previewTab.setText(previewTab.getText());
+        HTMLStyle.setEnabled(false);
+        rawText.setEnabled(true);
+        revalidate();
+        repaint();
+    }
 }

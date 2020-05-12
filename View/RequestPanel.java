@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
@@ -40,8 +41,8 @@ public class RequestPanel extends JPanel {
     private TabbedPanel reqPanel = new TabbedPanel();
     private JPanel body = new JPanel(), auth = new JPanel(), query = new JPanel(), header = new JPanel(),
             docs = new JPanel();
-    private JList headerList = new JList();
-    
+    private JButton addHeaderButton = new JButton("add Header");
+
     private Controller controller;
 
     public RequestPanel() {
@@ -87,11 +88,11 @@ public class RequestPanel extends JPanel {
         reqPanel.addTab("Header", header);
         reqPanel.addTab("Docs", docs);
         setBackground(new Color(.3f, .2f, .4f));
-        
+
         body.setBackground(new Color(.0f, .2f, .4f));
         query.setBackground(new Color(.1f, .0f, .4f));
         header.setBackground(new Color(.0f, .0f, .1f));
-        
+
         reqPanel.getButton("Body").setMenued(true);
         reqPanel.getButton("Body").add(new JSeparator());
         reqPanel.getButton("Body").add(new JMenuItem("Form URL Encoded"));
@@ -99,13 +100,27 @@ public class RequestPanel extends JPanel {
         reqPanel.getButton("Body").add(new JMenuItem("JSON"));
         reqPanel.getButton("Body").add(new JSeparator());
         reqPanel.getButton("Body").add(new JMenuItem("Binary"));
-        
+
         reqPanel.getButton("Auth").setMenued(true);
         reqPanel.getButton("Auth").add(new JSeparator());
         reqPanel.getButton("Auth").add(new JMenuItem("Authentication Type 1"));
         reqPanel.getButton("Auth").add(new JSeparator());
         reqPanel.getButton("Auth").add(new JMenuItem("No Authentication"));
-        
+
+        initHeaderTab();
+    }
+
+    public void initHeaderTab() {
+        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+        header.add(addHeaderButton);
+        addHeaderButton.setAlignmentX(CENTER_ALIGNMENT);
+        addHeaderButton.addActionListener(e -> addHeaderPair());
+    }
+
+    private void addHeaderPair() {
+        header.add(new PairPanel());
+        revalidate();
+        repaint();
     }
 
     /**
@@ -115,4 +130,5 @@ public class RequestPanel extends JPanel {
         this.controller = controller;
 
     }
+
 }
