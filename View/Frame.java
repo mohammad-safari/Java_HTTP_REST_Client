@@ -40,7 +40,7 @@ public class Frame extends JFrame {
         // left pane
         left.setBorder(null);
         left.setOpaque(true);
-        left.setDividerSize(1);
+        left.setDividerSize(4);
         left.setDividerLocation(300);
         left.setRightComponent(right);
         left.setLeftComponent(sidePanel);
@@ -49,7 +49,7 @@ public class Frame extends JFrame {
         // right pane
         right.setBorder(null);
         right.setOpaque(true);
-        right.setDividerSize(1);
+        right.setDividerSize(4);
         right.setDividerLocation(375);
         right.setLeftComponent(requestPanel);
         right.setRightComponent(responsePanel);

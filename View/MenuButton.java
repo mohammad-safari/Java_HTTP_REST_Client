@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 
 public class MenuButton extends JToggleButton {
@@ -12,26 +13,32 @@ public class MenuButton extends JToggleButton {
      *
      */
     private static final long serialVersionUID = 3635006151633276306L;
-    private JPopupMenu menu;
-    private String origin;
+    protected Boolean menued = true;
+    protected String origin;
+    protected JPopupMenu menu;
+    private int arrow = 1;
 
-    public MenuButton(String label) {
-        super(label);
-        origin = label;
-        menu = new JPopupMenu(label);
-        super.addActionListener(e -> menu.show(this, (getWidth() / 2), getHeight() + 1));
+    public MenuButton(String text) {
+        super(text);
+        origin = text;
+        menu = new JPopupMenu(text);
+        super.addActionListener(e -> {if(menued){menu.show(this, (getWidth() / 2), getHeight() + 1);setSelected(false);}});
     }
 
-    public MenuButton(String label, int x, int y) {
-        super(label);
-        menu = new JPopupMenu(label);
+    public MenuButton(String text, int x, int y) {
+        super(text);
+        menu = new JPopupMenu(text);
         super.addActionListener(e -> menu.show(this, x, y));
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
+        if(arrow == 1)
         g.drawString("\u2b9f", getWidth() - 20, (int) (getHeight() / 2) + 1);
+        else if(arrow == 2)
+        g.drawString("\u2b9b", getWidth() - 20, (int) (getHeight() / 2) + 1);
+
     }
 
     /**
@@ -40,6 +47,10 @@ public class MenuButton extends JToggleButton {
      */
     public void add(JMenuItem item) {
         menu.add(item);
+    }
+
+    public void add(JSeparator sep) {
+        menu.add(sep);
     }
 
     /**
@@ -67,6 +78,19 @@ public class MenuButton extends JToggleButton {
     @Override
     public void setText(String text) {
         super.setText(text);
+    }
+    /**
+     * @param menued the menued to set
+     */
+    public void setMenued(Boolean menued) {
+        this.menued = menued;
+    }
+
+    /**
+     * @param arrow the arrow to set
+     */
+    public void setArrow(int arrow) {
+        this.arrow = arrow;
     }
 
 }

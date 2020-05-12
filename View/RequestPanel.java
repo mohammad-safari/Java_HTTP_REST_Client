@@ -2,14 +2,27 @@ package View;
 
 import java.awt.Color;
 import java.awt.Insets;
+import java.awt.PopupMenu;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.JTabbedPane;
 
 import Controller.Controller;
@@ -24,9 +37,11 @@ public class RequestPanel extends JPanel {
     private JComboBox reqBox = new JComboBox<String>(types);
     private JTextField addressBar = new JTextField("8.8.8.8");
     private JButton sendButton = new JButton("SEND");
-    private JTabbedPane reqPanel = new JTabbedPane();
+    private TabbedPanel reqPanel = new TabbedPanel();
     private JPanel body = new JPanel(), auth = new JPanel(), query = new JPanel(), header = new JPanel(),
             docs = new JPanel();
+    private JList headerList = new JList();
+    
     private Controller controller;
 
     public RequestPanel() {
@@ -66,12 +81,31 @@ public class RequestPanel extends JPanel {
         c.gridheight = GridBagConstraints.REMAINDER;
         c.weighty = 5;
         add(reqPanel, c);
-        reqPanel.addTab("Body "+'\u2b9b', body);
-        reqPanel.addTab("Auth "+'\u2b9b', auth);
+        reqPanel.addTab("Body", body);
+        reqPanel.addTab("Auth", auth);
         reqPanel.addTab("Query", query);
         reqPanel.addTab("Header", header);
         reqPanel.addTab("Docs", docs);
         setBackground(new Color(.3f, .2f, .4f));
+        
+        body.setBackground(new Color(.0f, .2f, .4f));
+        query.setBackground(new Color(.1f, .0f, .4f));
+        header.setBackground(new Color(.0f, .0f, .1f));
+        
+        reqPanel.getButton("Body").setMenued(true);
+        reqPanel.getButton("Body").add(new JSeparator());
+        reqPanel.getButton("Body").add(new JMenuItem("Form URL Encoded"));
+        reqPanel.getButton("Body").add(new JSeparator());
+        reqPanel.getButton("Body").add(new JMenuItem("JSON"));
+        reqPanel.getButton("Body").add(new JSeparator());
+        reqPanel.getButton("Body").add(new JMenuItem("Binary"));
+        
+        reqPanel.getButton("Auth").setMenued(true);
+        reqPanel.getButton("Auth").add(new JSeparator());
+        reqPanel.getButton("Auth").add(new JMenuItem("Authentication Type 1"));
+        reqPanel.getButton("Auth").add(new JSeparator());
+        reqPanel.getButton("Auth").add(new JMenuItem("No Authentication"));
+        
     }
 
     /**

@@ -19,10 +19,9 @@ public class Main {
                 } catch (final Exception e2) {
                     System.out.println("Couldnt Set NATIVE Look and Feel!");
                 }
-                
+
             }
         // assembling MVC parts
         final Frame view = new Frame();
-
     }
 }
