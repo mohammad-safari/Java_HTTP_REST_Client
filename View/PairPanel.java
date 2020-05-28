@@ -1,5 +1,6 @@
 package View;
 
+import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -8,6 +9,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
@@ -20,28 +22,32 @@ import java.awt.FlowLayout;
 public class PairPanel extends JPanel {
     private JTextField key = new JTextField(), value = new JTextField();
     private JCheckBox selectButton = new JCheckBox("");
-    private JButton deleteButton = new JButton(new ImageIcon(".\\src\\trash.jpg"));
+    private JButton deleteButton = new JButton(new ImageIcon("./Resources/trash.jpg"));
 
     public PairPanel() {
-        super(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        add(key);
-        add(value);
-        add(selectButton);
-        add(deleteButton);
+        super();
+        GroupLayout glo =  new GroupLayout(this);
+        glo.setAutoCreateGaps(true);
+        glo.setAutoCreateContainerGaps(true);
+        setLayout(glo);
+        glo.setHorizontalGroup(glo.createSequentialGroup().addComponent(key, 85, 85, 100).addComponent(value, 85, 85, 100).addComponent(selectButton).addComponent(deleteButton, 15, 15, 15));
+        glo.setVerticalGroup(glo.createParallelGroup().addComponent(key, 20, 20, 20).addComponent(value, 20, 20, 20).addComponent(selectButton, 20, 20, 20).addComponent(deleteButton, 20, 20, 20));
         setOpaque(false);
         deleteButton.setBorderPainted(false);
         key.setPreferredSize(new Dimension(85, 25));
         value.setPreferredSize(new Dimension(85, 25));
         selectButton.setSelected(true);
         deleteButton.addActionListener(e -> {
+            Container parent = getParent();
             try {
-                getParent().remove(this);
-                getParent().revalidate();
-                getParent().repaint();
+                parent.remove(this);
+                parent.revalidate();
+                parent.repaint();
             } catch (Exception ex) {
             }
         });
         selectButton.addChangeListener(e -> {
+            Container parent = getParent();
             if (selectButton.isSelected()) {
                 key.setEnabled(true);
                 value.setEnabled(true);
@@ -49,8 +55,8 @@ public class PairPanel extends JPanel {
                 key.setEnabled(false);
                 value.setEnabled(false);
             }
-            getParent().revalidate();
-            getParent().repaint();
+            parent.revalidate();
+            parent.repaint();
         });
     }
 }

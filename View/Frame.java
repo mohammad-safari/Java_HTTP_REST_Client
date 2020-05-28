@@ -14,7 +14,9 @@ import java.awt.Component;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JSplitPane;
 
 import Controller.Controller;
@@ -41,68 +43,82 @@ public class Frame extends JFrame {
         // frame initialization
         super("HTTP Request Debug App");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(1000, 600);
+        setBounds(100, 100, 1200, 600);
 
         initGUI();
 
-        addWindowListener(new WindowAdapter() {
+        // configuring close operation for window when window event happens
+        WindowAdapter windowAdapter = new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent) {
-                if (menuBar.hide.isSelected()) {
+                // check whether hideOnExit is selected
+                if (menuBar.getHideOnExit().isSelected()) {
+                    // Check whether the SystemTray is supported
+                    if (!SystemTray.isSupported()) {
+                        JOptionPane message = new JOptionPane();
+                        JOptionPane.showConfirmDialog(message, "SystemTray is not supported", "Hide on Exit",
+                                JOptionPane.OK_OPTION);
+                        menuBar.getHideOnExit().setSelected(false);
+                        return;
+                    }
+
+                    // setting Extended State
                     setExtendedState(JFrame.ICONIFIED);
+                    setVisible(false);
+                    // setting close operation
                     setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-                    /**
-                     * //Check the SystemTray is supported
-        if (!SystemTray.isSupported()) {
-            System.out.println("SystemTray is not supported");
-            return;
-        }
-        final PopupMenu popup = new PopupMenu();
-        final TrayIcon trayIcon =
-                new TrayIcon(createImage("images/bulb.gif", "tray icon"));
-        final SystemTray tray = SystemTray.getSystemTray();
-       
-        // Create a pop-up menu components
-        MenuItem aboutItem = new MenuItem("About");
-        CheckboxMenuItem cb1 = new CheckboxMenuItem("Set auto size");
-        CheckboxMenuItem cb2 = new CheckboxMenuItem("Set tooltip");
-        Menu displayMenu = new Menu("Display");
-        MenuItem errorItem = new MenuItem("Error");
-        MenuItem warningItem = new MenuItem("Warning");
-        MenuItem infoItem = new MenuItem("Info");
-        MenuItem noneItem = new MenuItem("None");
-        MenuItem exitItem = new MenuItem("Exit");
-       
-        //Add components to pop-up menu
-        popup.add(aboutItem);
-        popup.addSeparator();
-        popup.add(cb1);
-        popup.add(cb2);
-        popup.addSeparator();
-        popup.add(displayMenu);
-        displayMenu.add(errorItem);
-        displayMenu.add(warningItem);
-        displayMenu.add(infoItem);
-        displayMenu.add(noneItem);
-        popup.add(exitItem);
-       
-        trayIcon.setPopupMenu(popup);
-       
-        try {
-            tray.add(trayIcon);
-        } catch (AWTException e) {
-            System.out.println("TrayIcon could not be added.");
-        }
-                     */
+
+                    final SystemTray tray = SystemTray.getSystemTray();
+                    final PopupMenu popup = new PopupMenu();
+                    final TrayIcon trayIcon = new TrayIcon(getToolkit().getImage("./Resources/cup.png"));
+
+                    // Create a pop-up menu components
+                    MenuItem aboutItem = new MenuItem("About");
+                    // showing about frame
+                    aboutItem.addActionListener(e -> new About());
+                    CheckboxMenuItem size = new CheckboxMenuItem("Set auto size");
+                    CheckboxMenuItem tooltip = new CheckboxMenuItem("Set tooltip");
+                    MenuItem displayItem = new MenuItem("Display");
+                    // displaying app gui
+                    displayItem.addActionListener(e -> {
+                        setVisible(true);
+                        setExtendedState(JFrame.NORMAL);
+                    });
+                    // exitting the app
+                    MenuItem exitItem = new MenuItem("Exit");
+                    exitItem.addActionListener(e -> {
+                        System.exit(0);
+                    });
+
+                    // adding pop-up menu for tray icon
+                    trayIcon.setPopupMenu(popup);
+
+                    // Add components to pop-up menu
+                    popup.add(aboutItem);
+                    popup.addSeparator();
+                    popup.add(size);
+                    popup.add(tooltip);
+                    popup.addSeparator();
+                    popup.add(displayItem);
+                    popup.add(exitItem);
+
+                    try {
+                        tray.add(trayIcon);
+                    } catch (AWTException e) {
+                        JOptionPane message = new JOptionPane();
+                        JOptionPane.showConfirmDialog(message, "TrayIcon could not be added", "Hide on Exit",
+                                JOptionPane.OK_OPTION);
+                    }
 
                 } else {
                     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 }
             }
-        });
+        };
+
+        addWindowListener(windowAdapter);
 
         // setting visible
         setVisible(true);
-        // pack();
     }
 
     public void initGUI() {
@@ -132,16 +148,18 @@ public class Frame extends JFrame {
     public void toggleFullScreen() {
         if (getExtendedState() != JFrame.MAXIMIZED_BOTH) {
             setExtendedState(JFrame.MAXIMIZED_BOTH);
-            setUndecorated(true);
-            setVisible(true);
+            // setUndecorated(true);
             revalidate();
             repaint();
         } else {
             toggleActual();
+            // setUndecorated(true);
         }
     }
 
     public void toggleActual() {
+        if (getExtendedState() == JFrame.NORMAL)
+            setSize(1200, 600);
         setExtendedState(JFrame.NORMAL);
         revalidate();
         repaint();
@@ -153,8 +171,10 @@ public class Frame extends JFrame {
     public void toggleSidePanel() {
         if (sidePanel.isVisible())
             sidePanel.setVisible(false);
-        else
+        else {
             sidePanel.setVisible(true);
+            left.setDividerLocation(250);
+        }
         sidePanel.revalidate();
         sidePanel.repaint();
     }

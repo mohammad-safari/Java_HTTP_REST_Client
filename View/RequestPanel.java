@@ -119,8 +119,8 @@ public class RequestPanel extends JPanel {
 
     private void addHeaderPair() {
         header.add(new PairPanel());
-        revalidate();
-        repaint();
+        header.revalidate();
+        header.repaint();
     }
 
     /**

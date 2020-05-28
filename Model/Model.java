@@ -1,8 +1,18 @@
 package Model;
 
-import java.util.TreeSet;
+// import java.io.File;
+// import java.io.FileWriter;
+// import java.io.InputStream;
+
+// import Controller.Controller;
 
 public class Model {
-    private TreeSet<Request> requestTree;
+    // private Controller controller;
+    // private InputStream input;
+    // private FileWriter writer;
+    // private File file;
+    public Model(){
+
+    }
 
 }

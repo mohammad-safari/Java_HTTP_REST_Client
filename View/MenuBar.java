@@ -13,6 +13,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 import Controller.Controller;
 
@@ -48,8 +49,16 @@ public class MenuBar extends JMenuBar {
                         license = new JMenuItem("show open source licenses"),
                         shortcut = new JMenuItem("keyboard shortcut"), help = new JMenuItem("app help");
         // preference
-        JCheckBox fred = new JCheckBox("Follow Redirect");
-        JCheckBox hide = new JCheckBox("Hide on System Tray");
+        private JCheckBox followRedirect = new JCheckBox("Follow Redirect");
+        private JCheckBox hideOnExit = new JCheckBox("Hide on System Tray");
+
+        public JCheckBox getHideOnExit() {
+                return hideOnExit;
+        }
+
+        public JCheckBox getFollowRedirect() {
+                return followRedirect;
+        }
 
         public MenuBar() {
                 setBorderPainted(false);
@@ -103,11 +112,11 @@ public class MenuBar extends JMenuBar {
                 // viewMenu
                 viewMenu.add(full);
                 full.setAccelerator(KeyStroke.getKeyStroke("F11"));
-                full.addActionListener(e -> ((Frame) getParent()).toggleFullScreen());
+                full.addActionListener(e -> (((Frame) (SwingUtilities.getRoot(this)))).toggleFullScreen());
 
                 viewMenu.add(actual);
                 actual.setAccelerator(KeyStroke.getKeyStroke("control 0"));
-                actual.addActionListener(e -> ((Frame) getParent()).toggleActual());
+                actual.addActionListener(e -> (((Frame) (SwingUtilities.getRoot(this)))).toggleActual());
 
                 viewMenu.add(zin);
                 zin.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, ActionEvent.CTRL_MASK));
@@ -116,7 +125,7 @@ public class MenuBar extends JMenuBar {
                 zout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, ActionEvent.CTRL_MASK));
 
                 viewMenu.add(sidebar);
-                sidebar.addActionListener(e -> ((Frame) getParent()).toggleSidePanel());
+                sidebar.addActionListener(e -> ((Frame) (SwingUtilities.getRoot(this))).toggleSidePanel());
 
                 viewMenu.add(devtools);
 
@@ -158,8 +167,8 @@ public class MenuBar extends JMenuBar {
                 // pref.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 pref.setBounds(200, 200, 300, 200);
                 JPanel panel = new JPanel();
-                panel.add(fred);
-                panel.add(hide);
+                panel.add(followRedirect);
+                panel.add(hideOnExit);
                 pref.add(panel);
 
                 pref.setVisible(true);
