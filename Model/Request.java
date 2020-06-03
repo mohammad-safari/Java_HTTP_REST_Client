@@ -1,6 +1,9 @@
 package Model;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -13,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 enum Method {
     GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH, OTHER;
@@ -55,9 +59,21 @@ public class Request implements Serializable {
     private Method method = Method.GET; // method of request
     private String messageBody; // message body would be a form, or a json, or or any file
     private Map<String, String> parameters = new HashMap<>(); // parameters of request
-    // private Map<String, List<String>> headers = new HashMap<String, List<String>>();// properties of request(client-side
+    private Map<String, List<String>> headers = new HashMap<String, List<String>>();// properties of request(client-side
     // headers)
     private boolean followRedirect = false; // option of following redirect
+    private boolean showHeaderResponse = false; // option of returning response header
+    private String boundary = Long.toHexString(new Random().nextLong()); // used in multipart-form data
+
+    /**
+     * 
+     * @param urlAddress
+     * @throws MalformedURLException
+     * @throws IOException
+     */
+    public Request(String urlAddress) throws MalformedURLException, IOException {
+        init(urlAddress);
+    }
 
     /**
      * opening a request connection
@@ -69,8 +85,7 @@ public class Request implements Serializable {
     public void init(String urlAddress) throws MalformedURLException, IOException {
         url = new URL(urlAddress);
         con = (HttpURLConnection) url.openConnection();
-        // System.out.println("Malformed Url, please enter url in correct format");
-        // System.out.println("Exception in connection input happened!");
+        headers = con.getRequestProperties();
     }
 
     /**
@@ -100,7 +115,7 @@ public class Request implements Serializable {
      * @param key
      * @param value
      */
-    public void setHeader(String key, String value) {        
+    public void setHeader(String key, String value) {
         con.setRequestProperty(key, value);
     }
 
@@ -117,11 +132,15 @@ public class Request implements Serializable {
     public void prepareGetMethod() {
     }
 
-    public void preparePostMethod() {
+    public void prepareMultpart() throws IOException {
+        con.setDoOutput(true);
+        setHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+        String charset = "UTF-8";
+
+    OutputStream output = con.getOutputStream();
+    PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
+
     }
 
-    public static void main(String[] args) {
-        // new Request().init("");
-    }
 
 }
