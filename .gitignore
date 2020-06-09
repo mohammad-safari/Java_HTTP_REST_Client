@@ -1,7 +1,7 @@
-#gitignore
-#
+# gitignore
+# compiled files
 *.class
-#
+# vscode configurations
 .vscode
-#
-.data
+# app data and cache
+Data

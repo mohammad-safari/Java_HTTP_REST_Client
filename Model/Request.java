@@ -1,17 +1,11 @@
 package Model;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.Path;
-import java.security.KeyStore.Entry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +33,34 @@ enum Method {
             case OPTIONS:
                 return "OPTIONS";
             case TRACE:
-                return "OPTIONS";
+                return "TRACE";
             case PATCH:
                 return "PATCH";
             default:
                 return "OTHER";
+        }
+    }
+
+    public static Method toMethod(String method) {
+        switch (method) {
+            case "GET":
+                return GET;
+            case "HEAD":
+                return HEAD;
+            case "POST":
+                return POST;
+            case "PUT":
+                return PUT;
+            case "DELETE":
+                return DELETE;
+            case "CONNECT":
+                return CONNECT;
+            case "OPTIONS":
+                return OPTIONS;
+            case "TRACE":
+                return TRACE;
+            default:
+                return OTHER;
         }
     }
 }
@@ -55,15 +72,13 @@ public class Request implements Serializable {
     private static final long serialVersionUID = 499498293015481510L;
 
     private URL url; // desired desination of request
-    private HttpURLConnection con; // managing connection of request
-    private Method method = Method.GET; // method of request
-    private String messageBody; // message body would be a form, or a json, or or any file
-    private Map<String, String> parameters = new HashMap<>(); // parameters of request
-    private Map<String, List<String>> headers = new HashMap<String, List<String>>();// properties of request(client-side
-    // headers)
+    private transient HttpURLConnection con; // managing connection of request
+    private String method = "GET"; // method of request
+    private transient MultipartStreamBuilder multipart;
+    private Map<String, String> parameters; // parameters of request
+    private Map<String, List<String>> headers;// properties of request(client-side headers)
     private boolean followRedirect = false; // option of following redirect
-    private boolean showHeaderResponse = false; // option of returning response header
-    private String boundary = Long.toHexString(new Random().nextLong()); // used in multipart-form data
+    private String boundary; // used in multipart-form data
 
     /**
      * 
@@ -72,20 +87,29 @@ public class Request implements Serializable {
      * @throws IOException
      */
     public Request(String urlAddress) throws MalformedURLException, IOException {
-        init(urlAddress);
+        // destination url should be set when created
+        url = new URL(urlAddress.substring(0, 6) == "http://" ? urlAddress : "http://" + urlAddress);
+        // connection get opened when created
+        con = (HttpURLConnection) url.openConnection();
+        // headers(properties) of connection are now saved in this map
+        headers = con.getRequestProperties();
+        // setting boundary key
+        boundary = Long.toHexString(new Random().nextLong()); 
     }
 
     /**
-     * opening a request connection
+     * reopening a request connection after loaded or closed
      * 
      * @param urlAddress destination of request
      * @throws MalformedURLException
      * @throws IOException
      */
-    public void init(String urlAddress) throws MalformedURLException, IOException {
-        url = new URL(urlAddress);
+    public void init() throws IOException {
+        // connection get reopened
         con = (HttpURLConnection) url.openConnection();
-        headers = con.getRequestProperties();
+        // headers(properties) of connection are reloaded
+        setHedears((HashMap<String, List<String>>) headers);
+        // rewriting output stream generally!
     }
 
     /**
@@ -129,18 +153,37 @@ public class Request implements Serializable {
         con.addRequestProperty(key, value);
     }
 
-    public void prepareGetMethod() {
-    }
-
-    public void prepareMultpart() throws IOException {
+    /**
+     * prepare for posting pararmters-json-binary
+     * 
+     * @throws IOException
+     */
+    public String prepareMultpart() throws IOException {
         con.setDoOutput(true);
         setHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
-        String charset = "UTF-8";
-
-    OutputStream output = con.getOutputStream();
-    PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
-
+        multipart = new MultipartStreamBuilder(con.getOutputStream(), boundary);
+        return boundary;
     }
 
+    /**
+     * 
+     * @param method
+     * @throws ProtocolException
+     */
+    public void setMethod(String method) throws ProtocolException {
+        if (Method.toMethod(method) == Method.OTHER) {
+            con.setRequestProperty("X-HTTP-Method-Override", method);
+            method = "GET";
+        }
+        con.setRequestMethod(method);
+    }
 
+    public Map<String, List<String>> getResponseHeaders() {
+        return con.getHeaderFields();
+    }
+
+    // temp
+    public HttpURLConnection getConnection() {
+        return con;
+    }
 }
