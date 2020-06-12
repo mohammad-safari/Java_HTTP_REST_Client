@@ -18,11 +18,19 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+
+interface StreamBuilder{
+
+}
+
 public class MultipartStreamBuilder {
 
-    private transient OutputStream output; // main stream of the connection will be written at writeToStream
-    private transient BufferedOutputStream bufferedOutput; // all changes happen to this stream before final write
-    private transient PrintWriter writer; // used for writing String formated to bufferd stream
+    private OutputStream output; // main stream of the connection will be written at writeToStream
+    private BufferedOutputStream bufferedOutput; // all changes happen to this stream before final write
+    private PrintWriter writer; // used for writing String formated to bufferd stream
     private String boundary; // the key which separates parts of outstream
     private final String CRLF = "\r\n"; // CRLF character(string)
 
@@ -49,9 +57,40 @@ public class MultipartStreamBuilder {
         writer.append("--" + boundary).append(CRLF);
         writer.append("Content-Disposition: form-data; name=\"" + key + "\"").append(CRLF);
         writer.append("Content-Type: text/plain; charset=" + "UTF-8").append(CRLF);
-        writer.append(CRLF).append("\"" + val + "\"").append(CRLF).flush(); // end of boundary
+        writer.append(CRLF).append("\"" + val + "\"").append(CRLF).flush(); // pointing end of boundary
     }
 
+    public void addJSONTextPart(String jsonString) throws JsonSyntaxException, JsonParseException {
+        JsonParser parser = new JsonParser();
+        parser.parse(jsonString);
+        // if got no exceptions go ahead!
+        writer.append("--" + boundary).append(CRLF);
+        writer.append("Content-Disposition: form-data; name=\"JSONText\"").append(CRLF);
+        writer.append("Content-Type: application/json; charset=" + "UTF-8").append(CRLF); // The text file saved in
+                                                                                          // UTF-8 charset!
+        writer.append(CRLF).append(jsonString).append(CRLF).flush(); // pointing end of boundary
+
+    }
+
+    /**
+     * 
+     * @param text
+     * @throws IOException
+     */
+    public void addTextPart(String text) {
+        writer.append("--" + boundary).append(CRLF);
+        writer.append("Content-Disposition: form-data; name=\"text\"").append(CRLF);
+        writer.append("Content-Type: text/plain; charset=" + "UTF-8").append(CRLF); // The text string gonna be in UTF-8
+                                                                                    // charset!
+        writer.append(CRLF).append(text).append(CRLF).flush(); // pointing end of boundary.
+
+    }
+
+    /**
+     * adding a plain text file to messsage body
+     * @param textFile
+     * @throws IOException
+     */
     public void addTextFilePart(File textFile) throws IOException {
         writer.append("--" + boundary).append(CRLF);
         writer.append("Content-Disposition: form-data; name=\"textFile\"; filename=\"" + textFile.getName() + "\"")
@@ -59,12 +98,20 @@ public class MultipartStreamBuilder {
         writer.append("Content-Type: text/plain; charset=" + "UTF-8").append(CRLF); // The text file saved in UTF-8
                                                                                     // charset!
         writer.append(CRLF).flush();
+        // writing file to bufferd output directly
         Files.copy(textFile.toPath(), bufferedOutput);
         bufferedOutput.flush();
+        //
         writer.append(CRLF).flush(); // pointing end of boundary.
 
     }
 
+    /**
+     * writing arbitrary binary file to message body
+     * @param binaryFile
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
     public void addBinaryFilePart(File binaryFile) throws FileNotFoundException, IOException {
         writer.append("--" + boundary).append(CRLF);
         writer.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + binaryFile.getName() + "\"")
@@ -73,8 +120,8 @@ public class MultipartStreamBuilder {
                 .append(CRLF);
         writer.append("Content-Transfer-Encoding: binary").append(CRLF);
         writer.append(CRLF).flush();
-        Files.copy(binaryFile.toPath(), output);
-        output.flush();
+        Files.copy(binaryFile.toPath(), bufferedOutput);
+        bufferedOutput.flush();
         writer.append(CRLF).flush();
     }
 
@@ -90,6 +137,7 @@ public class MultipartStreamBuilder {
         bufferedOutput.flush();
         // ending multipart stream
         new PrintWriter(output).append("--" + boundary + "--").append(CRLF).flush();
+        output.close();
     }
 
 }

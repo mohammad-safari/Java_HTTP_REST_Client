@@ -135,6 +135,20 @@ public class FileSystemCollection<T> implements Serializable {
         return folder.addFile(directory[directory.length - 1], request);
     }
 
+    public void removeFolder(String path) throws Exception {
+        Folder<T> folder = openFolder(path);
+        if (folder.getChilds().isEmpty()) {
+            folder.getParent().removeFolder(folder);
+        } else {
+            throw new Exception("Folder " + toDirectories(path)[toDirectories(path).length - 1] + " is not Empty!");
+        }
+    }
+
+    public void removeFile(String path) throws Exception {
+        File<T> file = openFile(path);
+        file.getParent().removeFile(file);
+    }
+
 }
 
 /**
@@ -287,5 +301,10 @@ class File<T> extends Node {
 
     public void setObject(T object) {
         this.object = object;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Folder<T> getParent() {
+        return (Folder<T>) parent;
     }
 }
