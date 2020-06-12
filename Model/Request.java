@@ -8,17 +8,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
@@ -178,11 +183,12 @@ public class Request implements Serializable {
                 query = query + param.getKey() + "=" + param.getValue() + "&";
             query = query.substring(0, query.length() - 2); // deleting the last ampersand
         }
-        con = (HttpURLConnection) new URL((url.substring(0, 6) == "http://" ? "" : "http://") + url
-                + (url.charAt(url.length() - 1) == '/' ? "" : "/") + query).openConnection(); // adding http, slash and
+        con = (HttpURLConnection) new URL(url + query).openConnection(); // adding http, slash and
                                                                                               // query to url
         // loading previous headers
         setHeaders(headers);
+        // method
+        setMethod(method);
         // loading body
         multipartReady = false;
     }
@@ -236,29 +242,40 @@ public class Request implements Serializable {
      *                           method isn't valid for HTTP
      */
     public void setMethod(String method) throws ProtocolException {
+        this.method = method;
         if (Method.toMethod(method) == Method.OTHER) {
-            con.setRequestProperty("X-HTTP-Method-Override", method);
-            method = "POST";
+            addMethod(method);
         }
         con.setRequestMethod(method);
     }
 
     /**
-     * the mask method must be given in this overload (default method is GET)
+     * using reflection api to override and add other methods to list of
+     * authenticated(Standard) methods of HTTPURLConnection only in RUNTIME
      * 
-     * @param method the method of request
-     * @throws ProtocolException if the method cannot be reset or if the requested
-     *                           method isn't valid for HTTP
+     * @param method the non-standard method name
      */
-    public void setMethod(String method, Method mask) throws ProtocolException {
-        if (Method.toMethod(method) == Method.OTHER) {
-            con.setRequestProperty("X-HTTP-Method-Override", method);
-            if (mask != Method.OTHER)
-                method = mask.toString();
-            else
-                method = "PUT";
+    private static void addMethod(String method) {
+        try {
+
+            // getting runtime methods of HTTPConnection into a reflect field
+            Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
+
+            // getting runtime modifiers of field class into a reflect field
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
+            methodsField.setAccessible(true);
+
+            String[] oldMethods = (String[]) methodsField.get(null);
+            Set<String> methodSet = new LinkedHashSet<>(Arrays.asList(oldMethods));
+            methodSet.add(method);
+            String[] newMethods = methodSet.toArray(new String[0]);
+
+            methodsField.set(null, newMethods);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new IllegalStateException(e);
         }
-        con.setRequestMethod(method);
     }
 
     /**
@@ -289,8 +306,12 @@ public class Request implements Serializable {
         if (multipartReady) {
             for (Map.Entry<String, String> entry : parameters.entrySet())
                 multipart.addParameterPart(entry.getKey(), entry.getValue());
-            multipart.addJSONTextPart(json);
-            multipart.addTextPart(text);
+            if (json != null)
+                if (!json.equals(""))
+                    multipart.addJSONTextPart(json);
+            if (text != null)
+                if (!text.equals(""))
+                    multipart.addTextPart(text);
             for (String path : textFiles)
                 multipart.addTextFilePart(new File(path));
             for (String path : binaryFiles)
@@ -424,5 +445,22 @@ public class Request implements Serializable {
     // temp
     public HttpURLConnection getConnection() {
         return con;
+    }
+
+    public boolean getMultipartReady() {
+        return multipartReady;
+    }
+
+    /**
+     * designed for jurl recognizing when to prepare multipart/form-data
+     * 
+     * @throws IOException when an I/O exception of some sort has occurred
+     */
+    public void setMultipartWise() throws IOException {
+        if ((parameters == null || parameters.size() == 0) && (text == null || text.equals(""))
+                && (json == null || json.equals("")) && (binaryFiles == null || binaryFiles.size() == 0)
+                && (textFiles == null || textFiles.size() == 0))
+            return;
+        prepareMultipart();
     }
 }

@@ -102,10 +102,10 @@ public class FileSystemCollection<T> implements Serializable {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public File<T> openFile(String path) throws Exception {
+    public ObjectFile<T> openFile(String path) throws Exception {
         String[] directory = toDirectories(path);
         Folder<T> folder = openParentFolder(directory);
-        File<T> file = ((folder != null) ? ((File<T>) folder.getChild(directory[directory.length - 1], false)) : null);
+        ObjectFile<T> file = ((folder != null) ? ((ObjectFile<T>) folder.getChild(directory[directory.length - 1], false)) : null);
         if (file == null)
             throw new Exception("File does not Exist");
         return file;
@@ -145,7 +145,7 @@ public class FileSystemCollection<T> implements Serializable {
     }
 
     public void removeFile(String path) throws Exception {
-        File<T> file = openFile(path);
+        ObjectFile<T> file = openFile(path);
         file.getParent().removeFile(file);
     }
 
@@ -225,15 +225,15 @@ class Folder<T> extends Node {
     public Folder<T> addFile(String name, T object) {
         for (Node child : childs) {
             if (child.name.equals(name) && child.isFolder == false) {
-                ((File<T>) child).setObject(object);
+                ((ObjectFile<T>) child).setObject(object);
                 return this;
             }
         }
-        childs.add(new File<T>(name, this, object));
+        childs.add(new ObjectFile<T>(name, this, object));
         return this;
     }
 
-    public void removeFile(File<T> node) {
+    public void removeFile(ObjectFile<T> node) {
         childs.remove(node);
     }
 
@@ -279,18 +279,18 @@ class Folder<T> extends Node {
     }
 }
 
-class File<T> extends Node {
+class ObjectFile<T> extends Node {
     /**
      *
      */
     private static final long serialVersionUID = -6772728741937095961L;
     private T object;
 
-    public File(String name, Node parent) {
+    public ObjectFile(String name, Node parent) {
         super(name, parent, false);
     }
 
-    public File(String name, Node parent, T object) {
+    public ObjectFile(String name, Node parent, T object) {
         super(name, parent, false);
         this.object = object;
     }

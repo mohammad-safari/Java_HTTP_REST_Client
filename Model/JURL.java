@@ -87,6 +87,7 @@ public class JURL {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         // loading set of requests
         loadRequests();
@@ -129,11 +130,55 @@ public class JURL {
                 // return;
             }
             case "fire":
-            // running one of saved requests
+            // running list of saved requests
             {
                 // implement addressing in fscollection and name validation
-                // if folder(s)
-                // if file(s)
+                // listing all arguments in list
+                ArrayList<String> arguments = new ArrayList<String>();
+                for (String arg : args)
+                    if (arg.equals(args[0]))
+                        continue;
+                    else
+                        arguments.add(arg);
+                Iterator<String> iter = arguments.iterator();
+                while (iter.hasNext()) {
+                    // if folder(s)
+                    String arg = iter.next();
+                    if (arg.equals("-f")) {
+                        if (!iter.hasNext()) {
+                            System.out.println("folder path argument missing!");
+                            return;
+                        }
+                        try {
+                            ArrayList<Node> group = requests.openFolder(iter.next()).getChilds();
+                            for (Node run : group)
+                                if (!run.isFolder) {
+                                    Request current = ((ObjectFile<Request>) run).getObject();
+                                    current.loadConnection();
+                                    sendRequest(current);
+                                }
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            // e.printStackTrace();
+                            System.out.println(e);
+                            return;
+                        }
+                    }
+                    // if file(s)
+                    else {
+                        try {
+                            ObjectFile<Request> run = requests.openFile(arg);
+                            Request current = run.getObject();
+                            current.loadConnection();
+                            sendRequest(current);
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            // e.printStackTrace();
+                            System.out.println(e);
+                            return;
+                        }
+                    }
+                }
                 break;
                 // return;
             }
@@ -187,14 +232,11 @@ public class JURL {
                         requests.createFile(arguments.get(++index), current);
                     } catch (IndexOutOfBoundsException e) {
                         System.out.println("name argument is missing!");
+                        return;
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
+                        return;
                     }
-                }
-
-                // giving query to url
-                if (arguments.contains("-Q") || arguments.contains("--query")) {
-
                 }
 
                 // follow redirect
@@ -298,10 +340,42 @@ public class JURL {
                         //
                         case "--save":
                         case "-S":
+                            // implemented outside of loop
+                            iter.next();
                             break;
                         case "--query":
-                        case "-Q":
+                        case "-Q": {
+                            if (!iter.hasNext()) {
+                                System.out.println("query arguments are missing!");
+                                return;
+                            }
+                            String[] input = iter.next().split("&");
+                            Map<String, String> param = new HashMap<String, String>();
+                            for (String entry : input) {
+                                String[] val = entry.split("=", 2);
+                                // if header is a null string
+                                if (val[0].equals("")) {
+                                    System.out.println("query Key missing!");
+                                    return;
+                                }
+                                // if header specifies no value data
+                                if (val.length == 1) {
+                                    System.out.println("query key: " + val[0] + " not specified!");
+                                    return;
+                                }
+                                // setting query entry in data
+                                param.put(val[0], val[1]);
+                            }
+                            try {
+                                current.setQuery(param);
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                // e.printStackTrace();
+                                System.out.println("improper query vlaues has been passed!");
+                                return;
+                            }
                             break;
+                        }
                         case "--output":
                         case "-O":
                             if (iter.hasNext()) {
@@ -312,11 +386,13 @@ public class JURL {
                             break;
                         case "--help":
                         case "-h":
-                            //
+                            // !
                             break;
                         case "-i":
+                            // implemented outside of loop
                             break;
                         case "-f":
+                            // implemented outside of loop
                             break;
                         default: {
                             System.out.println("unexpected command/argument " + arg + " entered!");
@@ -325,58 +401,60 @@ public class JURL {
                     }
 
                 }
-
-                // sending request
-                try {
-                    // writing if multipart stream builder id prepared
-                    System.out.println(current.getConnection().getRequestMethod());
-                    // current.writeBodyStream();
-                    ByteArrayInputStream responseStream = new ByteArrayInputStream(current.sendRequest(/* 5000 */));
-                    char[] reader = new char[responseStream.available()];
-                    new InputStreamReader(responseStream).read(reader);
-                    System.out.println(reader);
-                } catch (UnknownHostException e) {
-                    // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    System.out.println("Unfortunaltely can not resolve the Host!");
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    try {
-                        if (current.getConnection().getResponseCode() >= 500)
-                            System.out.println("Server does not Provide Service");
-                    } catch (IOException ioe) {
-                        // TODO Auto-generated catch block
-                        // e.printStackTrace();
-                        System.out.println(ioe);
-                    }
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    System.out.println("some thing unknown happened to connection!");
-                }
-
+                sendRequest(current);
                 // showing header Responses
                 if (arguments.contains("-i")) {
+                    System.out.println("Response Headers:");
                     System.out.println(current.getResponseHeaders());
                 }
-
-                // try {
-                // // current.getConnection().setRequestMethod("GET");
-                // System.out.println(current.getConnection().getRequestMethod());
-                // System.out.println(current.getConnection().getResponseMessage());
-                // char[] reader = new
-                // char[current.getConnection().getInputStream().available()];
-                // new InputStreamReader(current.getConnection().getInputStream()).read(reader);
-                // System.out.println(reader);
-                // } catch (IOException e) {
-                // // TODO Auto-generated catch block
-                // e.printStackTrace();
-                // }
                 break;
             }
         }
 
         saveRequests();
+    }
+
+    /**
+     * sending a connection-loaded request
+     * 
+     * @param current the connection-loaded request
+     * @return the response headers
+     */
+    public static Map<String, List<String>> sendRequest(Request current) {
+        // sending request
+        try {
+            current.setMultipartWise();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        try {
+            // writing if multipart stream builder id prepared
+            System.out.println(current.getConnection().getRequestMethod());
+            ByteArrayInputStream responseStream = new ByteArrayInputStream(current.sendRequest(/* 5000 */));
+            char[] reader = new char[responseStream.available()];
+            new InputStreamReader(responseStream).read(reader);
+            System.out.println(reader);
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            // e.printStackTrace();
+            System.out.println("Unfortunaltely can not resolve the Host!");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            // e.printStackTrace();
+            try {
+                if (current.getConnection().getResponseCode() >= 500)
+                    System.out.println("Server does not Provide Service");
+            } catch (IOException ioe) {
+                // TODO Auto-generated catch block
+                // e.printStackTrace();
+                System.out.println(ioe);
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            // e.printStackTrace();
+            System.out.println("some thing unknown happened to connection!");
+        }
+        return current.getResponseHeaders();
     }
 }
