@@ -1,5 +1,7 @@
 package Model;
 
+import Controller.Controller;
+
 // import java.io.File;
 // import java.io.FileWriter;
 // import java.io.InputStream;
@@ -11,8 +13,11 @@ public class Model {
     // private InputStream input;
     // private FileWriter writer;
     // private File file;
-    public Model(){
+    public Model(Controller controller) {
 
     }
+    // public FileSystemCollection<Request> loadWorkspace(String Name){
+
+    // }
 
 }

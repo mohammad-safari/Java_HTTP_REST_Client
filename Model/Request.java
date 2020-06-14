@@ -116,9 +116,14 @@ public class Request implements Serializable {
      */
     public Request(String urlAddress) throws MalformedURLException, IOException {
         // validating url
-        new URL(((urlAddress.substring(0, 7).equals("http://") ? "" : "http://") + urlAddress));
-        // setting url address
-        url = (((urlAddress.substring(0, 7).equals("http://") ? "" : "http://") + urlAddress));
+        if (urlAddress.length() <= 7) {
+            new URL("http://" + urlAddress);
+            url = "http://" + urlAddress;
+        } else {
+            new URL(((urlAddress.substring(0, 7).equals("http://") ? "" : "http://") + urlAddress));
+            // setting url address
+            url = (((urlAddress.substring(0, 7).equals("http://") ? "" : "http://") + urlAddress));
+        }
         // connection get opened when created
         con = (HttpURLConnection) new URL(url).openConnection();
         // headers(properties) of connection are now saved in this map
@@ -146,10 +151,15 @@ public class Request implements Serializable {
      * @see {@link #loadConnection()}
      */
     public void setUrl(String url) throws MalformedURLException {
-        url = ((url.substring(0, 7).equals("http://") ? "" : "http://") + url);
-        new URL(url);
-        // setting url address
-        this.url = url;
+        // validating url
+        if (url.length() <= 7) {
+            new URL("http://" + url);
+            this.url = "http://" + url;
+        } else {
+            new URL(((url.substring(0, 7).equals("http://") ? "" : "http://") + url));
+            // setting url address
+            url = (((url.substring(0, 7).equals("http://") ? "" : "http://") + url));
+        }
     }
 
     /**
@@ -161,11 +171,12 @@ public class Request implements Serializable {
      * @see {@link #loadConnection()}
      */
     public void setQuery(Map<String, String> query) throws Exception {
-        for (Map.Entry<String, String> param : this.query.entrySet()) {
+        for (Map.Entry<String, String> param : query.entrySet()) {
             if (param.getKey() == "" || param.getValue() == "")
                 throw new Exception("query key or vlaue can not be empty!");
             this.query.put(param.getKey(), param.getValue());
         }
+        loadConnection();
     }
 
     /**
@@ -181,10 +192,10 @@ public class Request implements Serializable {
             query = "?";
             for (Map.Entry<String, String> param : this.query.entrySet())
                 query = query + param.getKey() + "=" + param.getValue() + "&";
-            query = query.substring(0, query.length() - 2); // deleting the last ampersand
+            query = query.substring(0, query.length() - 1); // deleting the last ampersand
         }
         con = (HttpURLConnection) new URL(url + query).openConnection(); // adding http, slash and
-                                                                                              // query to url
+                                                                         // query to url
         // loading previous headers
         setHeaders(headers);
         // method

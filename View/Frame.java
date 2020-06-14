@@ -29,22 +29,27 @@ public class Frame extends JFrame {
     Controller controller;
 
     // components of main frame
-    SidePanel sidePanel = new SidePanel();
+    SidePanel sidePanel;
     // response panel
-    private final MenuBar menuBar = new MenuBar();
+    private final MenuBar menuBar;
     // request panel
-    RequestPanel requestPanel = new RequestPanel();
+    RequestPanel requestPanel;
     // side panel
-    ResponsePanel responsePanel = new ResponsePanel();
+    ResponsePanel responsePanel;
     // panes and panels of main frame
     private final JSplitPane right = new JSplitPane(), left = new JSplitPane();
 
-    public Frame() {
+    public Frame(Controller controller) {
         // frame initialization
-        super("HTTP Request Debug App");
+        super("HTTP Client App");
+        setController(controller);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setBounds(100, 100, 1200, 600);
 
+        sidePanel = new SidePanel(controller);
+        menuBar = new MenuBar(controller);
+        requestPanel = new RequestPanel(controller);
+        responsePanel = new ResponsePanel(controller);
         initGUI();
 
         // configuring close operation for window when window event happens
@@ -185,5 +190,21 @@ public class Frame extends JFrame {
     public void setController(final Controller controller) {
         this.controller = controller;
 
+    }
+
+    public RequestPanel getRequestPanel() {
+        return requestPanel;
+    }
+
+    public ResponsePanel getResponsePanel() {
+        return responsePanel;
+    }
+
+    public SidePanel getSidePanel() {
+        return sidePanel;
+    }
+
+    public MenuBar getMyMenuBar(){
+        return menuBar;
     }
 }

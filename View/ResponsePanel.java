@@ -27,16 +27,17 @@ public class ResponsePanel extends JPanel {
     private static final long serialVersionUID = -7634778642783201670L;
     private TabbedPanel resPanel = new TabbedPanel();
     private MenuButton historyButton = new MenuButton("History");
-    private JTextPane previewTab = new JTextPane();
+    private JTextPane previewTab = new JTextPane(), responseHeader = new JTextPane();
     private JPanel prev = new JPanel(), cookie = new JPanel(), header = new JPanel(), timeline = new JPanel();
     private JLabel state = new JLabel(), ping = new JLabel(), size = new JLabel();
 
-    private JMenuItem rawText = new JMenuItem("raw style"), HTMLStyle = new JMenuItem("HTML style");
+    private JMenuItem rawText = new JMenuItem("Raw Style"), HTMLStyle = new JMenuItem("HTML Style");
 
     private Controller controller;
 
-    public ResponsePanel() {
+    public ResponsePanel(Controller controller) {
         super();
+        setController(controller);
         init();
     }
 
@@ -73,14 +74,16 @@ public class ResponsePanel extends JPanel {
         resPanel.addTab("TimeLine", timeline);
 
         resPanel.getButton("Preview").setMenued(true);
-        ;
+        
         resPanel.getButton("Preview").add(rawText);
         resPanel.getButton("Preview").add(HTMLStyle);
-        rawText.addActionListener(e -> setRawText());
-        HTMLStyle.addActionListener(e -> setHTMLText());
-        setHTMLText();
+        rawText.addActionListener(e -> setRawText(previewTab.getText()));
+        HTMLStyle.addActionListener(e -> setHTMLText(previewTab.getText()));
+        setHTMLText(previewTab.getText());
         previewTab.setText(
                 "<p></br></br></br>this is a <b>html</b> text<p></br></br><a href=\"https://www.google.com\">Here!</a>");
+        responseHeader.setText("nothing yet");
+        header.add(responseHeader);
 
     }
 
@@ -92,21 +95,24 @@ public class ResponsePanel extends JPanel {
 
     }
 
-    public void setRawText() {
+    public void setRawText(String text) {
         previewTab.setEditorKit(new StyledEditorKit());
-        previewTab.setText(previewTab.getText());
+        previewTab.setText(text);
         HTMLStyle.setEnabled(true);
         rawText.setEnabled(false);
         revalidate();
         repaint();
     }
 
-    public void setHTMLText() {
+    public void setHTMLText(String text) {
         previewTab.setEditorKit(new HTMLEditorKit());
-        previewTab.setText(previewTab.getText());
+        previewTab.setText(text);
         HTMLStyle.setEnabled(false);
         rawText.setEnabled(true);
         revalidate();
         repaint();
+    }
+    public JTextPane getResponseHeader() {
+        return responseHeader;
     }
 }

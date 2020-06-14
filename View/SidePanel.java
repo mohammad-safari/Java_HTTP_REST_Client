@@ -37,8 +37,9 @@ public class SidePanel extends JPanel {
         private Controller controller;
         private TreePath current;
 
-        public SidePanel() {
+        public SidePanel(Controller controller) {
                 super();
+                setController(controller);
                 init();
         }
 
@@ -73,8 +74,8 @@ public class SidePanel extends JPanel {
                 reqTree.setBorder(BorderFactory.createEtchedBorder());
                 reqTree.setBackground(new Color(.45f, .5f, .9f));
                 addRequest.addActionListener(e -> addnode());
-                reqTree.addTreeSelectionListener(new TreeSelectionListener(){
-                
+                reqTree.addTreeSelectionListener(new TreeSelectionListener() {
+
                         @Override
                         public void valueChanged(TreeSelectionEvent e) {
                                 current = e.getPath();
@@ -85,13 +86,15 @@ public class SidePanel extends JPanel {
         private void addnode() {
                 String whatTheUserEntered = JOptionPane.showInputDialog(this, "What is your request name?",
                                 "Enter your request name", JOptionPane.QUESTION_MESSAGE);
-                if (whatTheUserEntered != null) {
-                        DefaultTreeModel model = (DefaultTreeModel) reqTree.getModel();
-                        System.out.println("request" + reqTree.getRowCount() + 1);
-                        MutableTreeNode node = (MutableTreeNode) current.getLastPathComponent();
-                        model.insertNodeInto(new DefaultMutableTreeNode(whatTheUserEntered), node, node.getChildCount());
-
+                if (whatTheUserEntered == null) {
+                        whatTheUserEntered = ("request" + (reqTree.getRowCount() + 1));
                 }
+                DefaultTreeModel model = (DefaultTreeModel) reqTree.getModel();
+                MutableTreeNode node = (MutableTreeNode) current.getLastPathComponent();
+                if (node.getChildCount() != 0)
+                        model.insertNodeInto(new DefaultMutableTreeNode(whatTheUserEntered), node,
+                                        node.getChildCount());
+
         }
 
         /**

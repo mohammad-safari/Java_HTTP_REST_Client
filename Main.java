@@ -31,8 +31,10 @@ public class Main {
         }
 
         // assembling MVC peices
-        model = new Model();
-        view = new Frame();
-        // controller = new Controller(model, view);
+        controller = new Controller();
+        model = new Model(controller);
+        view = new Frame(controller);
+        controller.setModel(model);
+        controller.setView(view);
     }
 }

@@ -60,7 +60,8 @@ public class MenuBar extends JMenuBar {
                 return followRedirect;
         }
 
-        public MenuBar() {
+        public MenuBar(Controller controller) {
+                setController(controller);
                 setBorderPainted(false);
                 add(appMenu);
                 appMenu.setMnemonic(KeyEvent.VK_A);
@@ -178,4 +179,5 @@ public class MenuBar extends JMenuBar {
                 this.controller = controller;
 
         }
+
 }
