@@ -9,6 +9,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -40,6 +41,7 @@ public class SidePanel extends JPanel {
         public SidePanel(Controller controller) {
                 super();
                 setController(controller);
+                controller.getModel().loadWorkspace(reqTree);
                 init();
         }
 
@@ -91,9 +93,12 @@ public class SidePanel extends JPanel {
                 }
                 DefaultTreeModel model = (DefaultTreeModel) reqTree.getModel();
                 MutableTreeNode node = (MutableTreeNode) current.getLastPathComponent();
-                if (node.getChildCount() != 0)
+                if (node.getChildCount() != 0)// !!!
                         model.insertNodeInto(new DefaultMutableTreeNode(whatTheUserEntered), node,
                                         node.getChildCount());
+                else {
+                        JOptionPane.showMessageDialog(null, "cannot convert a request to folder");
+                }
 
         }
 

@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -149,6 +151,7 @@ public class JURL {
                             System.out.println("folder path argument missing!");
                             return;
                         }
+                        // running whole request
                         try {
                             ArrayList<Node> group = requests.openFolder(iter.next()).getChilds();
                             for (Node run : group)
@@ -200,6 +203,35 @@ public class JURL {
                 }
                 break;
                 // return;
+            }
+            case "-h":
+            case "--help":
+            case "help": {
+                try {
+                    BufferedReader help = new BufferedReader(new FileReader("./Model/Help.txt"));
+                    char[] buf = new char[1000];
+                    String check;
+                    while ((check = help.readLine()) != null) {
+                        check = check.replace("example:", "\033[1;31mexample:\033[0m");
+                        check = check.replace("-", "\033[35m-\033[0m");
+                        check = check.replace("\033[0m033[35m","");
+                        // check = check.replace("*", "\033[1;36m*\033[0m");
+                        check = check.replace("create", "\033[1;34mcreate\033[0m");
+                        check = check.replace("remove", "\033[1;36mremove\033[0m");
+                        check = check.replace("list", "\033[1;35mlist\033[0m");
+                        check = check.replace("fire", "\033[1;35mfire\033[0m");
+                        check = check.replace("help", "\033[1;33mhelp\033[0m");
+                        check = check.replace("URL", "\033[1;32mURL\033[0m");
+                        System.out.println(check);
+                    }
+                } catch (FileNotFoundException e) {
+                    System.err.println("help file not found");
+                    // e.printStackTrace();
+                } catch (IOException e) {
+                    System.err.println("could not read help");
+                    // e.printStackTrace();
+                }
+                break;
             }
             default: {
                 // creating(and running) a request
@@ -386,6 +418,7 @@ public class JURL {
                             break;
                         case "--help":
                         case "-h":
+
                             // !
                             break;
                         case "-i":
@@ -437,22 +470,22 @@ public class JURL {
             System.out.println(reader);
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
-            // e.printStackTrace();
+            e.printStackTrace();
             System.out.println("Unfortunaltely can not resolve the Host!");
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            // e.printStackTrace();
+            e.printStackTrace();
             try {
                 if (current.getConnection().getResponseCode() >= 500)
                     System.out.println("Server does not Provide Service");
             } catch (IOException ioe) {
                 // TODO Auto-generated catch block
-                // e.printStackTrace();
+                e.printStackTrace();
                 System.out.println(ioe);
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            // e.printStackTrace();
+            e.printStackTrace();
             System.out.println("some thing unknown happened to connection!");
         }
         return current.getResponseHeaders();

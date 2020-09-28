@@ -52,7 +52,9 @@ public class Frame extends JFrame {
         responsePanel = new ResponsePanel(controller);
         initGUI();
 
-        // configuring close operation for window when window event happens
+        /**
+         * configuring close operation for window when window event happens
+         */
         WindowAdapter windowAdapter = new WindowAdapter() {
             public void windowClosing(WindowEvent windowEvent) {
                 // check whether hideOnExit is selected
@@ -204,7 +206,7 @@ public class Frame extends JFrame {
         return sidePanel;
     }
 
-    public MenuBar getMyMenuBar(){
+    public MenuBar getMyMenuBar() {
         return menuBar;
     }
 }

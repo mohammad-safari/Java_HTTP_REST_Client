@@ -32,9 +32,9 @@ public class Main {
 
         // assembling MVC peices
         controller = new Controller();
-        model = new Model(controller);
-        view = new Frame(controller);
+        model = new Model(controller, "DefaultWorkspace");
         controller.setModel(model);
+        view = new Frame(controller);
         controller.setView(view);
     }
 }

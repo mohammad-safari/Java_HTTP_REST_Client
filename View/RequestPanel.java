@@ -100,6 +100,8 @@ public class RequestPanel extends JPanel {
         reqPanel.getButton("Body").add(new JSeparator());
         reqPanel.getButton("Body").add(BIN);
 
+        // binary.add();
+
         FD.addActionListener(e -> {
             reqPanel.getContainer("Body").removeAll();
             reqPanel.getContainer("Body").add(formdata);

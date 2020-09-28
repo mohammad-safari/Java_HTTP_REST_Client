@@ -3,6 +3,12 @@ package Model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+
 /**
  * a generic class for grouping objects in a file-system-like collection
  * 
@@ -17,6 +23,102 @@ public class FileSystemCollection<T> implements Serializable {
     public final Class<T> genericInstanceClass;
     private static final long serialVersionUID = -705057808584791795L;
     private Folder<T> root; // root of file-system-like collection
+
+    /**
+     * 
+     * @param tree
+     */
+    public void loadCollection(JTree tree) {
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        DefaultMutableTreeNode treeRoot = new DefaultMutableTreeNode();
+        model.setRoot(treeRoot);
+        for (Node node : root.getChilds()) {
+            loadTree(model, node, treeRoot);
+        }
+    }
+
+    /**
+     * loading nodes to a jtree model
+     * 
+     * @param model
+     * @param currentNode
+     * @param parentTreeNode
+     */
+    @SuppressWarnings("unchecked")
+    public void loadTree(DefaultTreeModel model, Node currentNode, DefaultMutableTreeNode parentTreeNode) {
+        if (currentNode.isFolder) {
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(currentNode.name);
+            node.setAllowsChildren(true);
+            model.insertNodeInto(node, parentTreeNode, parentTreeNode.getChildCount());
+
+            for (Node newNode : ((Folder<T>) currentNode).getChilds())
+                loadTree(model, newNode, node);
+
+        } else {
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(currentNode);
+            node.setAllowsChildren(false);
+            model.insertNodeInto(node, parentTreeNode, parentTreeNode.getChildCount());
+        }
+    }
+
+    /**
+     * designed for swing jtree
+     * 
+     * @param model
+     * @param folderName
+     * @param parentTreeNode
+     */
+    public void addFolderTreeNode(DefaultTreeModel model, String folderName, DefaultMutableTreeNode parentTreeNode) {
+        if (parentTreeNode.getAllowsChildren()) {
+            Folder<T> parentFolder;
+            try {
+                parentFolder = openParentFolder((String[]) parentTreeNode.getUserObjectPath());
+                parentFolder.addFolder(folderName);
+                model.insertNodeInto(new DefaultMutableTreeNode(parentFolder.getChild(folderName, true)),
+                        parentTreeNode, parentTreeNode.getChildCount());
+            } catch (Exception e) {
+                System.out.println(e);
+                System.out.println((String[]) parentTreeNode.getUserObjectPath());
+            }
+        }
+    }
+    public void addFolderTreeNode(DefaultTreeModel model, String folderName) {
+        DefaultMutableTreeNode parentTreeNode = (DefaultMutableTreeNode) model.getRoot();
+        if (parentTreeNode.getAllowsChildren()) {
+            Folder<T> parentFolder;
+            try {
+                root.addFolder(folderName);
+                model.insertNodeInto(new DefaultMutableTreeNode(root.getChild(folderName, true)),
+                        parentTreeNode, parentTreeNode.getChildCount());
+            } catch (Exception e) {
+                System.out.println(e);
+                System.out.println(parentTreeNode.getUserObjectPath());
+            }
+        }
+    }
+
+    /**
+     * designed for swing jtree
+     * 
+     * @param model
+     * @param obj
+     * @param name
+     * @param parentTreeNode
+     */
+    public void addFileTreeNode(DefaultTreeModel model, T obj, String name, DefaultMutableTreeNode parentTreeNode) {
+        if (parentTreeNode.getAllowsChildren()) {
+            Folder<T> parentFolder;
+            try {
+                parentFolder = openParentFolder((String[]) parentTreeNode.getUserObjectPath());
+                parentFolder.addFile(name, obj);
+                model.insertNodeInto(new DefaultMutableTreeNode(parentFolder.getChild(name, false)), parentTreeNode,
+                        parentTreeNode.getChildCount());
+            } catch (Exception e) {
+                System.out.println(e);
+                System.out.println((String[]) parentTreeNode.getUserObjectPath());
+            }
+        }
+    }
 
     /**
      * initializing a root folder
@@ -105,7 +207,9 @@ public class FileSystemCollection<T> implements Serializable {
     public ObjectFile<T> openFile(String path) throws Exception {
         String[] directory = toDirectories(path);
         Folder<T> folder = openParentFolder(directory);
-        ObjectFile<T> file = ((folder != null) ? ((ObjectFile<T>) folder.getChild(directory[directory.length - 1], false)) : null);
+        ObjectFile<T> file = ((folder != null)
+                ? ((ObjectFile<T>) folder.getChild(directory[directory.length - 1], false))
+                : null);
         if (file == null)
             throw new Exception("File does not Exist");
         return file;
@@ -271,36 +375,6 @@ class Folder<T> extends Node {
             if (node.name.equals(name) && node.isFolder == isFolder)
                 return node;
         throw new Exception((isFolder ? "Folder " : "File ") + name + " does not Exist");
-    }
-
-    @SuppressWarnings("unchecked")
-    public Folder<T> getParent() {
-        return (Folder<T>) parent;
-    }
-}
-
-class ObjectFile<T> extends Node {
-    /**
-     *
-     */
-    private static final long serialVersionUID = -6772728741937095961L;
-    private T object;
-
-    public ObjectFile(String name, Node parent) {
-        super(name, parent, false);
-    }
-
-    public ObjectFile(String name, Node parent, T object) {
-        super(name, parent, false);
-        this.object = object;
-    }
-
-    public T getObject() {
-        return object;
-    }
-
-    public void setObject(T object) {
-        this.object = object;
     }
 
     @SuppressWarnings("unchecked")

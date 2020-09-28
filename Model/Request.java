@@ -403,7 +403,7 @@ public class Request implements Serializable {
      * @param outputPath
      */
     public void setOutputPath(String outputPath) {
-        new File(outputPath);
+        new File("./Data/" + outputPath);
         this.outputPath = outputPath;
     }
 
@@ -441,7 +441,7 @@ public class Request implements Serializable {
         inputStream.read(responseBody);
         // writing response to file
         if (!(outputPath == null || outputPath.equals(""))) {
-            OutputStream bodyStream = new FileOutputStream(new File(outputPath));
+            OutputStream bodyStream = new FileOutputStream(new File("./Data/" + outputPath));
             bodyStream.write(responseBody);
             bodyStream.flush();
         }

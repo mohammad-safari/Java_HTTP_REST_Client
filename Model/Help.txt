@@ -1,0 +1,54 @@
+Jurl version 1.0
+By M.Safari 1399.02.??
+
+Appliction Pattern
+Command [Options] [Arguments] [options]
+        Commands: 1-create 2-remove 3-fire 4-list 5-help 6-HTTP URL
+
+******************************************
+
+create: creating a folder with insider file system collection
+         (needs one argument with pattern:
+         path to existing folder("/" or nothing(") shows root) + new folder name
+         )
+        attention: can accept "/" and "\" as directory seprator but not mixed!
+        example: JURL create "test"(or "/test" and also "\test")
+
+******************************************
+
+remove:  removing an existing empty folder with option -f or
+         an existing saved request with complete directory as an argument.
+        example: JURL remove "test/req1" and then JURL remove "-f test"
+
+******************************************
+
+fire: executes all saved requests in given directory with "-f" option and 
+        one request normally with specific address in insider loaded fs
+
+******************************************
+
+list: lists folders and request on given directory 
+        as an argument(no argument means root directory)
+
+******************************************
+
+help -h or --help show current decription:)
+
+******************************************
+
+URL:    a proper http protocol url(not command URL itself! :D)
+            -s --save: saves current requset in given directory an next argument
+            -f enable: follwing redirect
+            -h --header: setting header in "key:val;key:val" format
+            -m --method: setting request method one of these args: 
+            GET POST OPTION PATCH DELETE ...??
+            --json: posting data as a json string(in multipart)
+                {key:val}
+            -d --data: posting data as form data content(in multipart)
+                "key=val&key=val"
+            -u --upload: posting a binary(in multipart)
+            -q --query: appending query when sending request
+                "key=va&key=val"
+            -O --output: saves request body to a given directory (in your os file system) or in default direcotry
+            -i: shows response headers
+
